@@ -1,19 +1,19 @@
 package com.example.liudan.sourcecodeanalysisone;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.view.Gravity;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
 
-    private List<Sample> samples;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,9 +22,17 @@ public class MainActivity extends AppCompatActivity {
 
         setupToolbar();
         setupWindowAnimation();
-        setupSamples();
-        setupLayout();
+        setupFragment();
 
+    }
+
+    private void setupFragment() {
+        SimpleFragmentPagerAdapter pagerAdapter = new SimpleFragmentPagerAdapter(getSupportFragmentManager(), this);
+        ViewPager viewpager = (ViewPager) findViewById(R.id.view_pager);
+        viewpager.setAdapter(pagerAdapter);
+        TabLayout tablayout = (TabLayout) findViewById(R.id.tab_layout);
+        tablayout.setupWithViewPager(viewpager);
+        tablayout.setTabMode(TabLayout.MODE_FIXED);
     }
 
     private void setupToolbar() {
@@ -42,26 +50,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setupSamples() {
-        samples = Arrays.asList(
-                new Sample(R.color.sample_red, "Transitions"),
-                new Sample(R.color.sample_blue, "Shared Elements"),
-                new Sample(R.color.sample_green, "View animations"),
-                new Sample(R.color.sample_yellow, "Circular Reveal Animation"),
-                new Sample(R.color.sample_blue, "Shared Elements"),
-                new Sample(R.color.sample_green, "View animations"),
-                new Sample(R.color.sample_yellow, "Circular Reveal Animation")
-        );
+    class SimpleFragmentPagerAdapter extends FragmentPagerAdapter {
+
+        private String[] tabTitles = {"tab1", "tab2", "tab3"};
+        private final int PAGE_COUNT = tabTitles.length;
+        private final Context context;
+
+        public SimpleFragmentPagerAdapter(FragmentManager fm, Context context) {
+            super(fm);
+            this.context = context;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return PageFragment.newInstance(position);
+        }
+
+        @Override
+        public int getCount() {
+            return PAGE_COUNT;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return tabTitles[position];
+        }
     }
-
-    private void setupLayout() {
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        SampleAdapter adapter = new SampleAdapter(this, samples);
-        recyclerView.setAdapter(adapter);
-
-    }
-
 
 }
